@@ -111,7 +111,7 @@ class MinHeap {
             if ((j < (n - 1)) && (((Record)heap[j]).compareTo((Record)heap[j + 1]) < 0)) {
                 j++; // j is now index of child with lesser value
             }
-            if (((Record)heap[pos]).compareTo((Record)heap[j]) >= 0) {
+            if (((Record)heap[pos]).compareTo((Record)heap[j]) <= 0) {
                 return;
             }
             swap(heap, pos, j);

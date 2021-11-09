@@ -19,6 +19,8 @@
 // letter of this restriction.
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
@@ -46,7 +48,5 @@ public class Externalsort {
                     + "\nThe program should be invoked as '> java Externalsort "
                     + "{record file name}'\nWhere record file name is a .txt file.");
         }
-        
     }
-
 }

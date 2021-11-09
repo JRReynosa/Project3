@@ -43,16 +43,35 @@ public class MinHeapTest extends TestCase {
     }
 
     
-    public void testParent() {
+    public void testremoveMin() {
         Record[] records = new Record[3];
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES + Double.BYTES);
         buffer.putLong(7);
         buffer.putDouble(8, 1);
+        ByteBuffer buffer2 = ByteBuffer.allocate(Long.BYTES + Double.BYTES);
+        buffer2.putLong(7);
+        buffer2.putDouble(8, 9);
+        ByteBuffer buffer3 = ByteBuffer.allocate(Long.BYTES + Double.BYTES);
+        buffer2.putLong(7);
+        buffer2.putDouble(8, 8);
         
-        System.out.println(buffer.get(1));
         byte[] aBite = buffer.array();
-       
-        System.out.println();
+        byte[] aBite2 = buffer2.array();
+        byte[] aBite3 = buffer3.array();
+        
+        
+        Record r1 = new Record(aBite);
+        Record r2 = new Record(aBite2);
+        Record r3 = new Record(aBite3);
+        
+        records[0] = r1;
+        records[1] = r2;
+        records[2] = r3;
+        
+        MinHeap heap = heap = new MinHeap(records, records.length, 512);
+        
+        assertEquals(r1, heap.removeMin());
+
   
 
     }
