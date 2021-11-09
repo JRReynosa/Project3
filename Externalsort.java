@@ -17,6 +17,7 @@
 // anything during the discussion or modifies any computer file
 // during the discussion. I have violated neither the spirit nor
 // letter of this restriction.
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,12 +42,58 @@ public class Externalsort {
      */
     public static void main(String[] args){
         
-        //Check whether arguments are valid
+        // Check whether arguments are valid
         if (args.length != 1) {
             throw new IllegalArgumentException(
                 "\nThe number of arguments is invalid."
-                    + "\nThe program should be invoked as '> java Externalsort "
-                    + "{record file name}'\nWhere record file name is a .txt file.");
+                + "\nThe program should be invoked as '> java Externalsort "
+                + "{record file name}'\nWhere record file name is a .txt file.");
         }
+               
+        try {
+        	 byte numRecords = 0;
+        	 int recordOffset = 0;
+
+        	 RandomAccessFile raf = new RandomAccessFile(args[0], "r");
+        	 
+        	 // Get the number of records in the file:
+        	 numRecords = raf.readByte();
+        	 System.out.println("The number of words is: " + numRecords); 
+        	 
+        	 for (int readRecords = 0; readRecords < numRecords; readRecords++) {
+        		 // Get the offset of the record:
+        		 recordOffset = raf.readUnsignedShort();
+        		 
+        		 // Save offset to return for next offset:
+        		 long offsetOfNextOffset = raf.getFilePointer();
+
+        		 // Go to that position.
+        		 raf.seek(recordOffset);
+        		 
+        		 // Get the record (all records are 16 bytes/128 bits):
+        		 long recordId = raf.readLong(); // Read first 8 bytes/64 bits
+        		 double recordKey = raf.readDouble();
+        		 
+        		 // Report results:
+        		 System.out.println("The next record offset is: " +
+        		 recordOffset);
+        		 System.out.println("The next record ID is: " + recordId);
+        		 System.out.println("The next record Key is: " + recordKey);
+
+        		 // Seek back to position of next offset:
+        		 raf.seek(offsetOfNextOffset);
+    		 }
+        	 
+    		 raf.close();
+    		 } 
+        
+        catch (FileNotFoundException e) {
+    		 System.err.println("This shouldn't happen: " + e);
+    		 } 
+        catch (IOException e) {
+    		 System.err.println("Writing error: " + e);
+    		 }
+        
     }
+
 }
