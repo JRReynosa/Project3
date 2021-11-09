@@ -1,0 +1,175 @@
+// On my honor:
+//
+// - I have not used source code obtained from another student,
+// or any other unauthorized source, either modified or
+// unmodified.
+//
+// - All source code and documentation used in my program is
+// either my original work, or was derived by me from the
+// source code published in the textbook for this course.
+//
+// - I have not discussed coding details about this project with
+// anyone other than my partner (in the case of a joint
+// submission), instructor, ACM/UPE tutors or the TAs assigned
+// to this course. I understand that I may discuss the concepts
+// of this program with other students, and that another student
+// may help me debug my program so long as neither of us writes
+// anything during the discussion or modifies any computer file
+// during the discussion. I have violated neither the spirit nor
+// letter of this restriction.
+
+/**
+ * @author Emilio Rivera
+ *
+ */
+// Min-heap implementation
+class MinHeap {
+    private Comparable[] heap; // Pointer to the heap array
+    private int size; // Maximum size of the heap
+    private int n; // Number of things now in heap
+
+    // Constructor supporting preloading of heap contents
+    MinHeap(Comparable[] h, int num, int max) {
+        heap = h;
+        n = num;
+        size = max;
+        buildheap();
+    }
+
+
+    // Return current size of the heap
+    public int heapsize() {
+        return n;
+    }
+
+
+    // Return true if pos a leaf position, false otherwise
+    public boolean isLeaf(int pos) {
+        return (pos >= n / 2) && (pos < n);
+    }
+
+
+    // Return position for left child of pos
+    public int leftchild(int pos) {
+        if (pos >= n / 2) {
+            return -1;
+        }
+        return 2 * pos + 1;
+    }
+
+
+    // Return position for right child of pos
+    public int rightchild(int pos) {
+        if (pos >= (n - 1) / 2) {
+            return -1;
+        }
+        return 2 * pos + 2;
+    }
+
+
+    // Return position for parent
+    public int parent(int pos) {
+        if (pos <= 0) {
+            return -1;
+        }
+        return (pos - 1) / 2;
+    }
+
+
+    // Insert val into heap
+    public void insert(int key) {
+        if (n >= size) {
+            System.out.println("Heap is full");
+            return;
+        }
+        int curr = n++;
+        heap[curr] = key; // Start at end of heap
+        // Now sift up until curr's parent's key > curr's key
+        while ((curr != 0) && (((Record)heap[curr]).compareTo((Record)heap[parent(
+            curr)]) < 0)) {
+            swap(heap, curr, parent(curr));
+            curr = parent(curr);
+        }
+    }
+
+
+    // Heapify contents of Heap
+    private void buildheap() {
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            siftdown(i);
+        }
+    }
+
+
+    // Put element in its correct place
+    private void siftdown(int pos) {
+        if ((pos < 0) || (pos >= n)) {
+            return;
+        } // Illegal position
+        while (!isLeaf(pos)) {
+            int j = leftchild(pos);
+            if ((j < (n - 1)) && (((Record)heap[j]).compareTo((Record)heap[j + 1]) < 0)) {
+                j++; // j is now index of child with lesser value
+            }
+            if (((Record)heap[pos]).compareTo((Record)heap[j]) >= 0) {
+                return;
+            }
+            swap(heap, pos, j);
+            pos = j; // Move down
+        }
+    }
+
+
+    // Remove and return maximum value
+    public Comparable removeMin() {
+        if (n == 0) {
+            return -1;
+        } // Removing from empty heap
+        swap(heap, 0, --n); // Swap Minimum with last value
+        siftdown(0); // Put new heap root val in correct place
+        return heap[n];
+    }
+
+
+    // Remove and return element at specified position
+    public Comparable remove(int pos) {
+        if ((pos < 0) || (pos >= n)) {
+            return -1;
+        } // Illegal heap position
+        if (pos == (n - 1)) {
+            n--;
+        } // Last element, no work to be done
+        else {
+            swap(heap, pos, --n); // Swap with last value
+            update(pos);
+        }
+        return heap[n];
+    }
+
+
+    // Modify the value at the given position
+    private void modify(int pos, Comparable newVal) {
+        if ((pos < 0) || (pos >= n)) {
+            return;
+        } // Illegal heap position
+        heap[pos] = newVal;
+        update(pos);
+    }
+
+    private void swap(Comparable[] arr, int left, int right) {
+        Comparable temp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = temp;
+    }
+
+
+    // The value at pos has been changed, restore the heap property
+    private void update(int pos) {
+        // If it is a big value, push it up
+        while ((pos > 0) && (((Record)heap[pos]).compareTo((Record)heap[parent(pos)]) < 0)) {
+            swap(heap, pos, parent(pos));
+            pos = parent(pos);
+        }
+        siftdown(pos); // If it is little, push down
+    }
+}
