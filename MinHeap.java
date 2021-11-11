@@ -35,8 +35,10 @@ class MinHeap {
         size = max;
         buildheap();
     }
-
-
+    
+    public boolean isFull() {
+        return n == size;
+    }
     // Return current size of the heap
     public int heapsize() {
         return n;
