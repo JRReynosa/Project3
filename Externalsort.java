@@ -17,12 +17,13 @@
 // anything during the discussion or modifies any computer file
 // during the discussion. I have violated neither the spirit nor
 // letter of this restriction.
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {Project Description Here}
@@ -35,7 +36,6 @@ import java.nio.ByteBuffer;
  * @version {Put Something Here}
  */
 public class Externalsort {
-
     /**
      * @param args
      *     Command line parameters
@@ -49,51 +49,59 @@ public class Externalsort {
                 + "\nThe program should be invoked as '> java Externalsort "
                 + "{record file name}'\nWhere record file name is a .txt file.");
         }
-               
+        
+        
         try {
-        	 byte numRecords = 0;
-        	 int recordOffset = 0;
+            
+            RandomAccessFile raf = new RandomAccessFile(args[0], "r");
+           
+            int blockSize = 512;
+            int recordSize = 16;
+            int outputCounter = 0;
 
-        	 RandomAccessFile raf = new RandomAccessFile(args[0], "r");
-        	 
-        	 // Get the number of records in the file:
-        	 numRecords = raf.readByte();
-        	 System.out.println("The number of words is: " + numRecords); 
-        	 
-        	 for (int readRecords = 0; readRecords < numRecords; readRecords++) {
-        		 // Get the offset of the record:
-        		 recordOffset = raf.readUnsignedShort();
-        		 
-        		 // Save offset to return for next offset:
-        		 long offsetOfNextOffset = raf.getFilePointer();
+            //Records with a size of 8 blocks
+            Record[] records = new Record[8*blockSize];
+           
+            // Input 8 blocks of records into an array of records
+            for(int i = 0; i < 8*blockSize; i++) {
+               byte[] bytes = new byte[recordSize]; 
+               
+               raf.read(bytes);
+               
+               Record tempRec = new Record(bytes);
+               
+               records[i] = tempRec;
+               
+               System.out.println("ID: "+ tempRec.getId()+" Key: " +tempRec.getKey()+"\n");
+               System.out.println("Index: "+i);
+            }
+            
+            // The array of records are put into the MinHeap
+            MinHeap heap = new MinHeap(records, records.length, 8*blockSize);
+            
+            // The InputBuffer array
+            byte[] inputBuffer = new byte[blockSize];
 
-        		 // Go to that position.
-        		 raf.seek(recordOffset);
-        		 
-        		 // Get the record (all records are 16 bytes/128 bits):
-        		 long recordId = raf.readLong(); // Read first 8 bytes/64 bits
-        		 double recordKey = raf.readDouble();
-        		 
-        		 // Report results:
-        		 System.out.println("The next record offset is: " +
-        		 recordOffset);
-        		 System.out.println("The next record ID is: " + recordId);
-        		 System.out.println("The next record Key is: " + recordKey);
-
-        		 // Seek back to position of next offset:
-        		 raf.seek(offsetOfNextOffset);
-    		 }
-        	 
-    		 raf.close();
-    		 } 
+            
+            //The output buffer array 
+            byte[] outputBuffer = new byte[blockSize];
+            
+            
+            while(outputCounter != blockSize) 
+            {
+                
+                outputCounter++;
+            }
+            raf.close();
+            
+        } 
         
         catch (FileNotFoundException e) {
-    		 System.err.println("This shouldn't happen: " + e);
-    		 } 
+             System.err.println("This shouldn't happen: " + e);
+             } 
         catch (IOException e) {
-    		 System.err.println("Writing error: " + e);
-    		 }
-        
+             System.err.println("Writing error: " + e);
+             }
+               
     }
-
 }

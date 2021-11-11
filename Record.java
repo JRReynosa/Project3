@@ -58,6 +58,11 @@ public class Record implements Comparable<Record> {
         ByteBuffer buff = ByteBuffer.wrap(completeRecord);
         return buff.getDouble(8);
     }
+    
+    public long getId() {
+        ByteBuffer buff = ByteBuffer.wrap(completeRecord);
+        return buff.getLong(0);
+    }
 
 
     /**
