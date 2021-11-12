@@ -38,6 +38,7 @@ import java.util.List;
 public class Externalsort {
     private static int blockSize = 8192;
     private static int recordSize = 16;
+    private static int recordsInBlock = 512;
     
     /**
      * @param args
@@ -57,47 +58,74 @@ public class Externalsort {
         try {
             
             RandomAccessFile raf = new RandomAccessFile(args[0], "r");
-          
-            //Array of bytes the length of 1 block
-            byte[] arr = new byte[blockSize];
             
-            //Put the bytes in the random access file into the array
-            raf.read(arr);
-            
-            //Convert array into ByteBuffer
-            ByteBuffer buffer = ByteBuffer.wrap(arr);
+            int recordArrSize = 0;
+            int numOfBlocks = 0;
+            // Input file has 8 or less blocks of data
+            if (raf.length() <= 8 * blockSize) {
+            	numOfBlocks = (int) (raf.length() / blockSize);
+            	recordArrSize = numOfBlocks * recordsInBlock;
+            }
+            else {
+            	numOfBlocks = 8;
+            	recordArrSize = numOfBlocks * recordsInBlock;
+            }
 
-            //Records with a size of 8 blocks
-            Record[] records = new Record[8*blockSize];
+            // Records array with size to hold 8 blocks of data
+            Record[] records = new Record[recordArrSize];
             
-            // Input 8 blocks of records into an array of records
-            for(int i = 0; i < blockSize; i++) {
-                byte[] bytes = new byte[blockSize];
-                raf.seek(blockSize*i);
+            int recordsIndex = 0;
+            
+            // The Input Buffer Array
+            byte[] inputBuffer = new byte[blockSize];
+            
+            //The Output Buffer Array 
+            byte[] outputBuffer = new byte[blockSize];
+            
+            // Input first 8 or n blocks of records into an array of records
+            for (int i = 0; i < numOfBlocks; i++) {
+            	
+            	// Read one block
+                raf.seek(blockSize * i);
+                inputBuffer = readBlock(raf);
+                ByteBuffer buffer = ByteBuffer.wrap(inputBuffer);
                 
-                raf.read(bytes);
+                // Input records into record array
+                for (int offset = 0; offset < blockSize; offset += 16) {
+                	byte[] recordBytes = new byte[recordSize];
+                	buffer.get(recordBytes);
+                	records[recordsIndex] = new Record(recordBytes);
+                	System.out.println("ID: "+ records[recordsIndex].getId()+" Key: " + records[recordsIndex].getKey()+"\n");
+                    System.out.println("Index: "+ recordsIndex);
+                	recordsIndex++;
+                }
                 
-                Record tempRec = new Record(bytes);
-             
-                records[i] = tempRec;
-                
-                System.out.println("ID: "+ tempRec.getId()+" Key: " +tempRec.getKey()+"\n");
-                System.out.println("Index: "+i);
             }
             
             // The array of records are put into the MinHeap
-            MinHeap heap = new MinHeap(records, records.length, 8*blockSize);
-
-            if (heap.isFull()) {
-                replacementSelection();
+            MinHeap heap = new MinHeap(records, records.length, 8*recordsInBlock);
+            
+            // Heap is full and input file contains exactly 8 blocks
+            // Or input file contains less than 8 blocks
+            if (heap.isFull() && raf.length() == 8 * blockSize ||
+            		raf.length() < 8 * blockSize) {
+                // Perform HeapSort
+            	
+            	// One block at a time, move data from heap to output buffer
+            	
+            	// Once output buffer is full, write to run file
+            	
             }
-            
-            // The InputBuffer array
-            byte[] inputBuffer = new byte[blockSize];
-            buffer.get(inputBuffer);
-            
-            //The output buffer array 
-            byte[] outputBuffer = new byte[blockSize];
+            else {
+            	// Continuously do the following three steps:
+            	
+            	// 1. Read next block into input buffer
+            	
+            	// 2. Perform Replacement Selection and write to output buffer
+            	replacementSelection();
+            	
+            	// 3. Once output buffer is full, write to run file
+            }
             
             raf.close();
             
@@ -111,6 +139,18 @@ public class Externalsort {
              }
                
     }
+    
+    public static byte[] readBlock(RandomAccessFile raf) {
+    	byte[] block = new byte[blockSize];
+    	try {
+			raf.read(block);
+		} catch (IOException e) {
+			System.err.println("Writing error: " + e);
+			e.printStackTrace();
+		}
+    	return block;
+    }
+    
     public static void replacementSelection() {
         
     }

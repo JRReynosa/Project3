@@ -24,12 +24,12 @@
  */
 // Min-heap implementation
 class MinHeap {
-    private Comparable[] heap; // Pointer to the heap array
+    private Record[] heap; // Pointer to the heap array
     private int size; // Maximum size of the heap
     private int n; // Number of things now in heap
 
     // Constructor supporting preloading of heap contents
-    MinHeap(Comparable[] h, int num, int max) {
+    MinHeap(Record[] h, int num, int max) {
         heap = h;
         n = num;
         size = max;
@@ -79,7 +79,7 @@ class MinHeap {
 
 
     // Insert val into heap
-    public void insert(int key) {
+    public void insert(Record key) {
         if (n >= size) {
             System.out.println("Heap is full");
             return;
@@ -87,8 +87,8 @@ class MinHeap {
         int curr = n++;
         heap[curr] = key; // Start at end of heap
         // Now sift up until curr's parent's key > curr's key
-        while ((curr != 0) && (((Record)heap[curr]).compareTo((Record)heap[parent(
-            curr)]) < 0)) {
+        while ((curr != 0) && heap[curr].compareTo(heap[parent(
+            curr)]) < 0) {
             swap(heap, curr, parent(curr));
             curr = parent(curr);
         }
@@ -110,10 +110,10 @@ class MinHeap {
         } // Illegal position
         while (!isLeaf(pos)) {
             int j = leftchild(pos);
-            if ((j < (n - 1)) && (((Record)heap[j]).compareTo((Record)heap[j + 1]) < 0)) {
+            if ((j < (n - 1)) && ((heap[j]).compareTo(heap[j + 1]) < 0)) {
                 j++; // j is now index of child with lesser value
             }
-            if (((Record)heap[pos]).compareTo((Record)heap[j]) <= 0) {
+            if ((heap[pos]).compareTo(heap[j]) <= 0) {
                 return;
             }
             swap(heap, pos, j);
@@ -123,9 +123,9 @@ class MinHeap {
 
 
     // Remove and return maximum value
-    public Comparable removeMin() {
+    public Record removeMin() {
         if (n == 0) {
-            return -1;
+            return null;
         } // Removing from empty heap
         swap(heap, 0, --n); // Swap Minimum with last value
         siftdown(0); // Put new heap root val in correct place
@@ -134,9 +134,9 @@ class MinHeap {
 
 
     // Remove and return element at specified position
-    public Comparable remove(int pos) {
+    public Record remove(int pos) {
         if ((pos < 0) || (pos >= n)) {
-            return -1;
+            return null;
         } // Illegal heap position
         if (pos == (n - 1)) {
             n--;
@@ -150,7 +150,7 @@ class MinHeap {
 
 
     // Modify the value at the given position
-    private void modify(int pos, Comparable newVal) {
+    private void modify(int pos, Record newVal) {
         if ((pos < 0) || (pos >= n)) {
             return;
         } // Illegal heap position
@@ -158,8 +158,8 @@ class MinHeap {
         update(pos);
     }
 
-    private void swap(Comparable[] arr, int left, int right) {
-        Comparable temp = arr[left];
+    private void swap(Record[] arr, int left, int right) {
+        Record temp = arr[left];
         arr[left] = arr[right];
         arr[right] = temp;
     }
@@ -168,7 +168,7 @@ class MinHeap {
     // The value at pos has been changed, restore the heap property
     private void update(int pos) {
         // If it is a big value, push it up
-        while ((pos > 0) && (((Record)heap[pos]).compareTo((Record)heap[parent(pos)]) < 0)) {
+        while ((pos > 0) && ((heap[pos]).compareTo(heap[parent(pos)]) < 0)) {
             swap(heap, pos, parent(pos));
             pos = parent(pos);
         }
