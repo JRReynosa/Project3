@@ -109,56 +109,66 @@ public class Reader {
                 // 1. Read next block into input buffer
 
                 // 2. Perform Replacement Selection and write to output buffer
-                while (!heap.isEmpty()) {
+                
+                while(!heap.isEmpty()) {
+                    
 
-                    // If output record buffer is empty input the min record
-                    if (numRecordsOut == 0) {
+                     // If output record buffer is empty input the min record
+                    if(numRecordsOut == 0) {
                         recordsOutput[numRecordsOut] = heap.removeMin();
-                        numRecordsOut++;
                     }
-                    // if the output record buffer is full
                     else if (numRecordsOut == recordsInBlock) {
-                        // write to run file
+                        //write to file
+                        
                         //empty out the output record
                         recordsOutput = new Record[recordsInBlock];
+                        
+                        //set counter to 0
                         numRecordsOut = 0;
+                        
                     }
-                    // if the input record buffer is empty
-                    // read the next block of bytes and convert it into
-                    // inputRecord array
-                    else if (numRecordsIn == 0) {
-                        blocksRead++;
-                        raf.seek(blocksRead);
-                        inputBuffer = readBlock(raf);
-                        ByteBuffer buffer = ByteBuffer.wrap(inputBuffer);
-                        recordsInput = bytesToRecords(buffer,
-                            recordArrSize);
-                    }
+
                     else {
                         int recsInserted = 0;
-
+                        
+                        // if the input record buffer is empty
+                        // read the next block of bytes and convert it into
+                        // inputRecord array
+                        if(numRecordsIn == 0) {
+                            blocksRead++;
+                            raf.seek(blocksRead*blockSize);
+                            inputBuffer = readBlock(raf);
+                            ByteBuffer buffer = ByteBuffer.wrap(inputBuffer);
+                            recordsInput = bytesToRecords(buffer,
+                                recordArrSize);
+                        }
+                        
                         // while the size of the output record array is not
                         // equal to 512 records
-                        while (numRecordsOut != recordsInBlock) {
-
+                        while(numRecordsOut != recordsInBlock) {
+                            
                             // if the first element in the inputRecord is
                             // greater than last element outputRecord
-                            if (greaterThan(recordsOutput, recordsInput)) {
+                            if (greaterThan(recordsOutput, recordsInput, numRecordsIn, numRecordsOut -1)) {
                                 heap.insert(recordsInput[recsInserted]);
-                                recordsOutput[numRecordsOut] = heap
+                                
+                                recordsOutput[numRecordsOut-1] = heap
                                     .removeMin();
 
+                                numRecordsIn++;
                                 numRecordsOut++;
                             }
                             else {
+                                
                                 heap.insert(recordsInput[recsInserted]);
                                 heap.decrementSize();
-                                recordsOutput[numRecordsOut] = heap
+                                recordsOutput[numRecordsOut-1] = heap
                                     .removeMin();
-
+                                
+                                numRecordsIn++;
                                 numRecordsOut++;
                             }
-
+                            
                             // if the records inserted are 512 then make empty
                             // record array
                             if (recsInserted == recordsInBlock) {
@@ -167,12 +177,10 @@ public class Reader {
                                 numRecordsIn = 0;
                             }
                             
-                            numRecordsIn++;
-                            recsInserted++;
                         }
                     }
+                    
                 }
-
                 // 3. Once output buffer is full, write to run file
             }
 
@@ -198,8 +206,8 @@ public class Reader {
      * @param input
      * @return
      */
-    public boolean greaterThan(Record[] output, Record[] input) {
-        return input[0].compareTo(output[output.length - 1]) > 0;
+    public boolean greaterThan(Record[] output, Record[] input, int inputIndex, int outputIndex) {
+        return input[inputIndex].compareTo(output[outputIndex]) > 0;
     }
 
 

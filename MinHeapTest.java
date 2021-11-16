@@ -26,6 +26,10 @@ public class MinHeapTest extends TestCase {
 
     public void testHeapsize() {
         assertEquals(1, heap.heapsize());
+        
+        heap.removeMin();
+        
+        assertEquals(0, heap.heapsize());
     }
 
 
