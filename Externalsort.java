@@ -116,15 +116,14 @@ public class Externalsort {
 
             // array of records which will later be used for the output buffer
             Record[] recordsOutput = new Record[recordsInBlock];
-            
+
             // array of records which will later be used for the input buffer
             Record[] recordsInput = new Record[recordsInBlock];
-            
-            
-           int numRecordsIn = 0;
-           
-           int numRecordsOut= 0;
-           
+
+            int numRecordsIn = 0;
+
+            int numRecordsOut = 0;
+
             // Heap is full and input file contains exactly 8 blocks
             // Or input file contains less than 8 blocks
             if (heap.isFull() && raf.length() == 8 * blockSize || raf
@@ -140,23 +139,25 @@ public class Externalsort {
                 // Continuously do the following three steps:
                 // 1. Read next block into input buffer
 
-                
                 // 2. Perform Replacement Selection and write to output buffer
-                while(!heap.isEmpty()) {
-                    
-                    //If output record buffer is empty input the min record
+                while (!heap.isEmpty()) {
+
+                    // If output record buffer is empty input the min record
                     if (numRecordsOut == 0) {
                         recordsOutput[numRecordsOut] = heap.removeMin();
                         numRecordsOut++;
                     }
-                    //if the output record buffer is full
-                    else if(numRecordsOut == recordsInBlock) {
+                    // if the output record buffer is full
+                    else if (numRecordsOut == recordsInBlock) {
                         // write to run file
+                        //empty out the output record
+                        recordsOutput = new Record[recordsInBlock];
+                        numRecordsOut = 0;
                     }
-                    //if the input record buffer is empty 
-                    // read the next block of bytes and convert it into 
+                    // if the input record buffer is empty
+                    // read the next block of bytes and convert it into
                     // inputRecord array
-                    else if(numRecordsIn == 0){
+                    else if (numRecordsIn == 0) {
                         blocksRead++;
                         raf.seek(blocksRead);
                         inputBuffer = readBlock(raf);
@@ -166,30 +167,38 @@ public class Externalsort {
                     }
                     else {
                         int recsInserted = 0;
-                        
-                        // while the size of the output record array is not equal to 512 records
-                        while(numRecordsOut != recordsInBlock) {
-                            
-                            if(greaterThan(recordsOutput, recordsInput)) {
+
+                        // while the size of the output record array is not
+                        // equal to 512 records
+                        while (numRecordsOut != recordsInBlock) {
+
+                            // if the first element in the inputRecord is
+                            // greater than last element outputRecord
+                            if (greaterThan(recordsOutput, recordsInput)) {
                                 heap.insert(recordsInput[recsInserted]);
-                                recordsOutput[numRecordsOut] = heap.removeMin();
-                                
+                                recordsOutput[numRecordsOut] = heap
+                                    .removeMin();
+
                                 numRecordsOut++;
                             }
                             else {
                                 heap.insert(recordsInput[recsInserted]);
                                 heap.decrementSize();
-                                recordsOutput[numRecordsOut] = heap.removeMin();
-                                
+                                recordsOutput[numRecordsOut] = heap
+                                    .removeMin();
+
                                 numRecordsOut++;
                             }
-                            
-                            
-                            //if the records inserted are 512 then make empty record
-                            if(recsInserted == recordsInBlock) {
+
+                            // if the records inserted are 512 then make empty
+                            // record array
+                            if (recsInserted == recordsInBlock) {
                                 recordsInput = new Record[recordsInBlock];
                                 
+                                numRecordsIn = 0;
                             }
+                            
+                            numRecordsIn++;
                             recsInserted++;
                         }
                     }
