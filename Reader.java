@@ -112,10 +112,10 @@ public class Reader {
                 
                 while(!heap.isEmpty()) {
                     
-
                      // If output record buffer is empty input the min record
                     if(numRecordsOut == 0) {
                         recordsOutput[numRecordsOut] = heap.removeMin();
+                        numRecordsOut++;
                     }
                     else if (numRecordsOut == recordsInBlock) {
                         //write to file
@@ -129,6 +129,7 @@ public class Reader {
                     }
 
                     else {
+                        
                         int recsInserted = 0;
                         
                         // if the input record buffer is empty
@@ -146,22 +147,30 @@ public class Reader {
                         // while the size of the output record array is not
                         // equal to 512 records
                         while(numRecordsOut != recordsInBlock) {
+      
+                            System.out.println("numRecordsOut " + numRecordsOut);
+                            
+                            System.out.println("numRecordsIn " + numRecordsIn);
+                           
+                            System.out.println("record input"+recordsInput[numRecordsIn]);
+                            
+                            System.out.println("record input"+recordsOutput[1]);
                             
                             // if the first element in the inputRecord is
                             // greater than last element outputRecord
                             if (greaterThan(recordsOutput, recordsInput, numRecordsIn, numRecordsOut -1)) {
+                                System.out.println("greater");
                                 heap.insert(recordsInput[recsInserted]);
                                 
-                                recordsOutput[numRecordsOut-1] = heap
+                                recordsOutput[numRecordsOut] = heap
                                     .removeMin();
 
                                 numRecordsIn++;
                                 numRecordsOut++;
                             }
                             else {
-                                
-                                heap.insert(recordsInput[recsInserted]);
-                                heap.decrementSize();
+                                System.out.println("less");
+                                heap.insert2(recordsInput[recsInserted]);
                                 recordsOutput[numRecordsOut-1] = heap
                                     .removeMin();
                                 
@@ -171,11 +180,13 @@ public class Reader {
                             
                             // if the records inserted are 512 then make empty
                             // record array
-                            if (recsInserted == recordsInBlock) {
+                            if (recsInserted == recordsInBlock-1) {
                                 recordsInput = new Record[recordsInBlock];
                                 
                                 numRecordsIn = 0;
                             }
+                            
+                            recsInserted++;
                             
                         }
                     }

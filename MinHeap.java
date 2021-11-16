@@ -100,6 +100,25 @@ class MinHeap {
             curr = parent(curr);
         }
     }
+    
+    public void insert2(Record key) {
+        if (n >= size) {
+            System.out.println("Heap is full");
+            return;
+        }
+        
+        //put record into the first slot in the heap
+        heap[0] = key;
+        
+        //Swap the last val with the first val
+        swap(heap, 0, n-1);
+        
+        //decrement size by 1 so that we do not access the last value
+        n--;
+           
+    }
+    
+    
 
 
     // Heapify contents of Heap
