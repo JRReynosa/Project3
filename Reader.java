@@ -152,9 +152,11 @@ public class Reader {
                             
                             System.out.println("numRecordsIn " + numRecordsIn);
                            
-                            System.out.println("record input"+recordsInput[numRecordsIn]);
+                            System.out.println("record input "+recordsInput[numRecordsIn]);
                             
-                            System.out.println("record input"+recordsOutput[1]);
+                            System.out.println("record output "+recordsOutput[numRecordsOut -1]);
+                            
+                            System.out.println("");
                             
                             // if the first element in the inputRecord is
                             // greater than last element outputRecord
