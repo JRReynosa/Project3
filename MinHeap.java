@@ -39,6 +39,13 @@ class MinHeap {
     public boolean isFull() {
         return n == size;
     }
+    
+    public void decrementSize() {
+        n--;
+    }
+    public boolean isEmpty() {
+        return n == 0;
+    }
     // Return current size of the heap
     public int heapsize() {
         return n;
