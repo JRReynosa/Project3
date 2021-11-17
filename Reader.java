@@ -249,14 +249,7 @@ public class Reader {
      * @return
      */
     public boolean greaterThan(Record[] output, Record[] input, int inputIndex, int outputIndex) {
-        if(input[inputIndex] == null) {
-           System.out.println("Input[index] is null inputIndex: "+ inputIndex);
-          // return false;
-        }
-        else if(output[outputIndex] == null){
-            System.out.println("Output[index] is null outputIndex: "+ outputIndex);
-          //  return false;
-        }
+
         return input[inputIndex].compareTo(output[outputIndex]) > 0;
     }
 
