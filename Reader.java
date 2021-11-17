@@ -125,7 +125,7 @@ public class Reader {
                     else if (numRecordsOut == recordsInBlock) {
                         // convert records array to bytes
                         outputBuffer = recordsToBytes(recordsOutput);
-                        System.out.println("Test");
+                        
                         // write to the run file
                         runFile.seek(writePos*blockSize);
                         
@@ -142,6 +142,15 @@ public class Reader {
                     }
 
                     else {
+                        
+                        if (recordsOutput[numRecordsOut - 1] == null) {
+                            System.out.println("Not more Outputs");
+                            break;
+                        }
+                        if (recordsInput[recsInserted] == null) {
+                            System.out.println("No more inputs");
+                            break;
+                        }
 
                         // if the input record buffer is empty
                         // read the next block of bytes and convert it into
@@ -169,15 +178,6 @@ public class Reader {
                         // input buffer is not empty
                         while (numRecordsOut < recordsInBlock
                             && numRecordsIn != 0) {
-
-                            if (recordsOutput[numRecordsOut - 1] == null) {
-                                System.out.println("Not more Outputs");
-                                return;
-                            }
-                            if (recordsInput[recsInserted] == null) {
-                                System.out.println("No more inputs");
-                                return;
-                            }
 
 //                            System.out.println("numRecordsOut "
 //                                + numRecordsOut);
@@ -229,6 +229,7 @@ public class Reader {
                 }
 
             }
+            
             byte[] inputBuffer2 = new byte[blockSize];
             inputBuffer2 = readBlock(runFile);
             ByteBuffer bb = ByteBuffer.wrap(inputBuffer2);
@@ -277,7 +278,7 @@ public class Reader {
         int offset = 0;
         for (int i = 0; i < records.length; i++) {
             buffer.put(offset, (byte)records[i].getId()).put(offset + 8, (byte)records[i].getKey());
-            offset += 16;
+            offset++;
         }
         
         buffer.get(outputBuffer);
