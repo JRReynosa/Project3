@@ -40,6 +40,10 @@ class MinHeap {
         return n == size;
     }
     
+    public Record[] getHeap() {
+        return heap;
+    }
+    
     public void decrementSize() {
         n--;
     }
