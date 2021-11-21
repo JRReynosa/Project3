@@ -32,13 +32,14 @@ public class Reader {
     private final int recordSize = 16;
     private final int recordsInBlock = 512;
 
+    @SuppressWarnings("unchecked")
     Reader(RandomAccessFile raf) {
         try {
 
-            System.out.println("Input File len "+ raf.length());
+            //System.out.println("Input File len "+ raf.length());
             RandomAccessFile runFile = new RandomAccessFile("runFile.bin",
                 "rw");
-            System.out.println(" length "+ runFile.length());
+           // System.out.println(" length "+ runFile.length());
             RandomAccessFile outputFile = new RandomAccessFile(
                 "output.bin", "rw");
             int recordArrSize = 0;
@@ -199,7 +200,7 @@ public class Reader {
                             // set counter to 0
                             recordsOutIndex = 0;
                             
-                            System.out.println("RunFile Length "+runFile.length());
+//                            System.out.println("RunFile Length "+runFile.length());
                             writePos++;
 
                         }
@@ -282,51 +283,17 @@ public class Reader {
                             && recordsOutIndex != recordsInBlock)
                             || (recordsOutIndex == 0
                                 && !isFirstTimeEver)) {
-                            // System.out.println("Normal processing");
 
-// System.out.println("recordsOutIndex "
-// + recordsOutIndex);
-// System.out.println("numRecordsInInputBuffer "
-// + numRecordsInInputBuffer);
-// System.out.println("record input "
-// + recordsInput[indexOfInputBuffer]);
-// System.out.println("record output "
-// + recordsOutput[recordsOutIndex]);
-// System.out.println("recsInserted "
-// + indexOfInputBuffer);
-// System.out.println("numRecordsThatSkippedTheInputBuffer " +
-// numRecordsThatSkippedTheInputBuffer);
-// System.out.println("numRecordsEverWrittenToInputBuffer " +
-// numRecordsEverWrittenToInputBuffer);
-// System.out.println("numRecordsEverWrittenToOutputBuffer " +
-// numRecordsEverWrittenToOutputBuffer);
-// System.out.println("File Length "+ raf.length());
-// System.out.println("File Pointer Position "+ blocksRead * blockSize);
-// System.out.println("");
 
                             // if the element in the inputRecord is
                             // greater than last element outputRecord
 
                             // System.out.println("indexOfInputBuffer"+
                             // indexOfInputBuffer);
-                            if (indexOfInputBuffer == 512) {
-// System.out.println(
-// "numRecordsEverWrittenToInputBuffer "
-// + numRecordsEverWrittenToInputBuffer);
-// System.out.println(
-// "numRecordsEverWrittenToOutputBuffer "
-// + numRecordsEverWrittenToOutputBuffer);
-//
-// System.out.println(
-// "numRecordsMoveInputToHeap "
-// + numRecordsMoveInputToHeap);
-
-                            }
 
                             if (greaterThan(recordsInput,
                                 indexOfInputBuffer,
                                 lastRecordReadFromHeap)) {
-// System.out.println("greater");
 
                                 heap.insert(
                                     recordsInput[indexOfInputBuffer]);
@@ -334,7 +301,7 @@ public class Reader {
 
                             }
                             else {
-// System.out.println("less or equal");
+
                                 heap.insert2(
                                     recordsInput[indexOfInputBuffer]);
                                 numLessThan++;
@@ -355,8 +322,7 @@ public class Reader {
                             numRecordsMoveInputToHeap++;
                         }
                         else {
-// System.out.println(
-// "Opps we should not get here ");
+
 
                         }
 
@@ -415,9 +381,6 @@ public class Reader {
 
                     Record[] straysArray = straysList.toArray(
                         new Record[straysList.size()]);
-//
-// System.out.println("straysArray.length "
-// + straysArray.length);
 
                     MinHeap hp = new MinHeap(straysArray,
                         straysArray.length, straysArray.length + 1);
@@ -427,12 +390,6 @@ public class Reader {
 
             heap = null;
 
-// byte[] inputBuffer2 = new byte[blockSize];
-// inputBuffer2 = readBlock(runFile);
-// ByteBuffer bb = ByteBuffer.wrap(inputBuffer2);
-//
-// Record[] test = bytesToRecords(bb, recordArrSize);
-// System.out.println("Record" +test[0].getId());
             raf.close();
             raf = null;
             
@@ -444,9 +401,9 @@ public class Reader {
             }
 
             // merge
-            int indexOutPut = 0;
+
             writePos = 0;
-            @SuppressWarnings("unused")
+          
             List<Run> destroyableListOfRuns = (List<Run>)runs.clone();
 
             for (int i = 0; i < destroyableListOfRuns.size(); i++) {
@@ -466,7 +423,6 @@ public class Reader {
 // System.out.println("numTimesWhiling " + numTimesWhiling);
 
                 if (indexOfOut == recordsInBlock) {
- System.out.println("Output buffer is Full");
 // System.out.println("Site F");
 // convert records array to bytes
                     outputBuffer = recordsToBytes(recordsOutput);
@@ -484,7 +440,7 @@ public class Reader {
                     }
                     // set counter to 0
                     indexOfOut = 0;
-                    indexOutPut++;
+                    
                     writePos++;
                 }
                 else {
@@ -505,8 +461,7 @@ public class Reader {
                     indexOfOut++;
 
                     if (run.getBlockOfRecord().size() == 0) {
-// System.out.println("It's empty. Time to refill or quit");
-// there is more stuff to fill it with
+
                         int numRecordsRemainingInThisRun = run
                             .getIndexOfLast() - run
                                 .getIndexOfLastRecRead();
@@ -526,10 +481,13 @@ public class Reader {
                 }
                 numTimesWhiling++;
             }
-            System.out.println("Number of times output buffer is full "+ indexOutPut);
+
+            
             numOfBlocks = (int)(outputFile.length() / blockSize);
+           
             int numOfBlocks2 = (int)(runFile.length() / blockSize);
             System.out.println("runFile length "+numOfBlocks2);
+            System.out.println("RunFile");
             
             int counter2 = 0;
             for(int i = 0; i < numOfBlocks2; i++) {
@@ -544,12 +502,12 @@ public class Reader {
                 buffer.get(bytes);
 
                 Record tempRecord = new Record(bytes);
-                if(counter2 == 10) {
+                if(counter2 == 5) {
                     System.out.println("");
                     
                    counter2 =0;
                 }
-                System.out.print("RunFile "+tempRecord
+                System.out.print("Blocks index: "+counter2+" "+tempRecord
                     .getId() +" "+ tempRecord
                     .getKey() +" "); 
 
@@ -557,6 +515,8 @@ public class Reader {
             }
             System.out.println("");
             System.out.println("");
+            
+            System.out.println("OutputFile");
             int counter = 0;
             for(int i = 0; i < numOfBlocks; i++) {
                
@@ -570,11 +530,11 @@ public class Reader {
                 buffer.get(bytes);
 
                 Record tempRecord = new Record(bytes);
-                if(counter == 10) {
+                if(counter == 5) {
                     System.out.println("");
                    counter =0;
                 }
-                System.out.print("OutFile "+tempRecord
+                System.out.print(tempRecord
                     .getId() +" "+ tempRecord
                     .getKey() +" "); 
 
