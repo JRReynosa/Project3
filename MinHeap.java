@@ -204,4 +204,49 @@ class MinHeap {
         }
         siftdown(pos); // If it is little, push down
     }
+    
+    private void heapify(Record arr[], int n, int i)
+    {
+        int smallest = i; // Initialize smallest as root
+        int left = 2 * i + 1; // left = 2*i + 1
+        int right = 2 * i + 2; // right = 2*i + 2
+ 
+        // If left child is smaller than root
+        if (left < n && arr[left].getKey() < arr[smallest].getKey())
+            smallest = left;
+ 
+        // If right child is smaller than smallest so far
+        if (right < n && arr[right].getKey() < arr[smallest].getKey())
+            smallest = right;
+ 
+        // If smallest is not root
+        if (smallest != i) {
+            Record temp = arr[i];
+            arr[i] = arr[smallest];
+            arr[smallest] = temp;
+ 
+            // Recursively heapify the affected sub-tree
+            heapify(arr, n, smallest);
+        }
+    }
+    
+    public void heapSort()
+    {
+        // Build heap (rearrange array)
+        for (int i = n / 2 - 1; i >= 0; i--) {
+        	heapify(heap, n, i);
+        }
+ 
+        // One by one extract an element from heap
+        for (int i = n - 1; i >= 0; i--) {
+             
+            // Move current root to end
+            Record temp = heap[0];
+            heap[0] = heap[i];
+            heap[i] = temp;
+ 
+            // call max heapify on the reduced heap
+            heapify(heap, i, 0);
+        }
+    }
 }

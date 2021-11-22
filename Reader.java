@@ -123,11 +123,25 @@ public class Reader {
             if (raf.length() == 8 * blockSize || raf.length() < 8
                 * blockSize) {
                 // Perform HeapSort
+            	heap.heapSort();
 
                 // One block at a time, move data from heap to output buffer
-
-                // Once output buffer is full, write to run file
-
+            	// and write to run file
+                for (int i = 0; i < numOfBlocks; i++) {
+                	
+                	// Read records from heap to the output buffer 
+                	// while buffer is less than 512 records
+                	int outBufferSize = 0;
+                    while (outBufferSize < recordsInBlock) {
+                    	recordsOutput[outBufferSize] = heap.removeMin();
+                    }
+                    
+                    // Write to run file
+                    outputBuffer = recordsToBytes(recordsOutput);
+                    runFile.seek(i * blockSize);
+                    runFile.write(outputBuffer);
+                    recordsOutput = new Record[recordsInBlock];
+                }
             }
             else {
                 while (!stop) {
