@@ -117,8 +117,8 @@ class MinHeap {
         //Swap the last val with the first val
         swap(heap, 0, n-1);
         
-        //decrement size by 1 so that we do not access the last value
-        n--;
+
+        siftdown(0);
            
     }
     
@@ -126,7 +126,7 @@ class MinHeap {
 
 
     // Heapify contents of Heap
-    private void buildheap() {
+    public void buildheap() {
         for (int i = n / 2 - 1; i >= 0; i--) {
             siftdown(i);
         }
@@ -140,7 +140,7 @@ class MinHeap {
         } // Illegal position
         while (!isLeaf(pos)) {
             int j = leftchild(pos);
-            if ((j < (n - 1)) && ((heap[j]).compareTo(heap[j + 1]) < 0)) {
+            if ((j < (n - 1)) && ((heap[j]).compareTo(heap[j + 1]) > 0)) {
                 j++; // j is now index of child with lesser value
             }
             if ((heap[pos]).compareTo(heap[j]) <= 0) {
