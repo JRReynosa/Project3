@@ -234,7 +234,7 @@ class MinHeap {
     {
         // Build heap (rearrange array)
         for (int i = n / 2 - 1; i >= 0; i--) {
-        	heapify(heap, n, i);
+            heapify(heap, n, i);
         }
  
         // One by one extract an element from heap

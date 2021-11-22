@@ -31,7 +31,10 @@ public class Reader {
     private final int blockSize = 8192;
     private final int recordSize = 16;
     private final int recordsInBlock = 512;
-
+    
+    private int blocksRead = 0;
+    private int numRecordsThatSkippedTheInputBuffer = 0;
+    
     @SuppressWarnings({ "unchecked", "resource" })
     Reader(RandomAccessFile raf) {
         try {
@@ -43,13 +46,9 @@ public class Reader {
 
             int recordArrSize = 0;
             int numOfBlocks = 0;
-            int blocksRead = 0;
-
-            int numRecordsThatSkippedTheInputBuffer = 0;
+            
             int numRecordsEverWrittenToInputBuffer = 0;
             int numRecordsEverWrittenToOutputBuffer = 0;
-
-            int recordsIndex = 0;
 
             int writePos = 0;
 
@@ -89,28 +88,7 @@ public class Reader {
             byte[] outputBuffer = new byte[blockSize];
 
             // Input first 8 or n blocks of records into an array of records
-            for (int i = 0; i < numOfBlocks; i++) {
-
-                // Read one block
-                inputBuffer = readBlock2(raf, blockSize * i);
-                ByteBuffer buffer = ByteBuffer.wrap(inputBuffer);
-
-                // Input records into record array
-                for (int offset = 0; offset < blockSize; offset += 16) {
-                    byte[] recordBytes = new byte[recordSize];
-                    buffer.get(recordBytes);
-                    records[recordsIndex] = new Record(recordBytes);
-
-                    recordsIndex++;
-                    numRecordsThatSkippedTheInputBuffer++;
-                }
-
-                blocksRead++;
-
-            }
-
-            MinHeap heap = new MinHeap(records, records.length, 8
-                * recordsInBlock);
+            MinHeap heap = fillHeap(raf, inputBuffer,records,numOfBlocks);
 
             // array of records which will later be used for the output buffer
             Record[] recordsOutput = new Record[recordsInBlock];
@@ -123,25 +101,25 @@ public class Reader {
             if (raf.length() == 8 * blockSize || raf.length() < 8
                 * blockSize) {
                 // Perform HeapSort
-            	heap.heapSort();
+                heap.heapSort();
 
                 // One block at a time, move data from heap to output buffer
-            	// and write to run file
+                // and write to run file
                 for (int i = 0; i < numOfBlocks; i++) {
-                	
-                	// Read records from heap to the output buffer 
-                	// while buffer is less than 512 records
-                	int outBufferSize = 0;
+                    
+                    // Read records from heap to the output buffer 
+                    // while buffer is less than 512 records
+                    int outBufferSize = 0;
                     while (outBufferSize < recordsInBlock) {
-                    	recordsOutput[outBufferSize] = heap.removeMin();
+                        recordsOutput[outBufferSize] = heap.removeMin();
                     }
                     
                     // Write to run file
-                    outputBuffer = recordsToBytes(recordsOutput);
-                    runFile.seek(i * blockSize);
-                    runFile.write(outputBuffer);
+                    writeOutputToFile(outputBuffer, recordsOutput,
+                        runFile, i);
                     recordsOutput = new Record[recordsInBlock];
                 }
+
             }
             else {
                 while (!stop) {
@@ -253,7 +231,6 @@ public class Reader {
                             numRecordsEverWrittenToOutputBuffer++;
                             numRecordsInInputBuffer--;
                             recordsOutIndex++;
-
                             indexOfInputBuffer++;
 
                         }
@@ -316,7 +293,8 @@ public class Reader {
             // merge
             writePos = 0;
             recordsOutput = new Record[recordsInBlock];
-
+            recordsInput = new Record[recordsInBlock];
+            
             List<Run> destroyableListOfRuns = (List<Run>)runs.clone();
 
             for (int i = 0; i < destroyableListOfRuns.size(); i++) {
@@ -458,7 +436,33 @@ public class Reader {
             counter++;
         }
     }
+    
+    public MinHeap fillHeap(RandomAccessFile raf, byte[] inputBuffer, Record[] records, int numOfBlocks) throws IOException {
+        int recordsIndex = 0;
 
+        for (int i = 0; i < numOfBlocks; i++) {
+
+            // Read one block
+            inputBuffer = readBlock2(raf, blockSize * i);
+            ByteBuffer buffer = ByteBuffer.wrap(inputBuffer);
+
+            // Input records into record array
+            for (int offset = 0; offset < blockSize; offset += 16) {
+                byte[] recordBytes = new byte[recordSize];
+                buffer.get(recordBytes);
+                records[recordsIndex] = new Record(recordBytes);
+
+                recordsIndex++;
+                numRecordsThatSkippedTheInputBuffer++;
+            }
+
+            blocksRead++;
+
+        }
+        MinHeap heap = new MinHeap(records, records.length, 8
+            * recordsInBlock);
+        return heap;
+    }
 
     /**
      * @param outputBuffer
