@@ -29,6 +29,7 @@ import student.TestCase;
 public class RecordTest extends TestCase {
 
     private byte[] aBite;
+    private Record rec;
 
 
     /**
@@ -39,26 +40,35 @@ public class RecordTest extends TestCase {
         buffer.putLong(7);
         buffer.putDouble(8, 1);
         aBite = buffer.array();
-    }
+        }
 
 
     /**
-     * Tests the first constructor
+     * Tests the constructor
      */
-    public void testConstruct1() {
+    public void testRecord() {
         Record rec = new Record(aBite);
         assertEquals((double)1, rec.getKey(), 0.00);
+        assertEquals((double)7, rec.getId(), 0.00);
         assertEquals(aBite, rec.getCompleteRecord());
         assertTrue(rec.toString().equals("1.0"));
     }
     
     /**
-     * Tests the first constructor
+     * Tests the compareTo()
      */
     public void testCompareTo() {
         Record rec = new Record(aBite);
         Record recToBeCompared = new Record(aBite);
         assertEquals(rec.compareTo(recToBeCompared), 0);
+    }
+    
+    /**
+     * Tests the toString()
+     */
+    public void testToString() {
+        Record rec = new Record(aBite);
+        assertEquals("1.0", rec.toString());
     }
 
 }

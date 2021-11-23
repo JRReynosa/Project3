@@ -20,6 +20,8 @@
 import student.TestCase;
 
 /**
+ * Test class for entry method to program
+ * 
  * @author 
  * @version 
  */
