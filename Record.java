@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
 public class Record implements Comparable<Record> {
 
     private byte[] completeRecord;
-
+    private double key;
     /**
      * The constructor for the Record class
      * 
@@ -37,6 +37,8 @@ public class Record implements Comparable<Record> {
      */
     public Record(byte[] record) {
         completeRecord = record;
+        ByteBuffer buff = ByteBuffer.wrap(completeRecord);
+        key = buff.getDouble(8);
     }
 
 

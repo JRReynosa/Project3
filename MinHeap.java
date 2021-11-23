@@ -44,9 +44,6 @@ class MinHeap {
         return heap;
     }
     
-    public void decrementSize() {
-        n--;
-    }
     public boolean isEmpty() {
         return n == 0;
     }
@@ -178,15 +175,6 @@ class MinHeap {
         return heap[n];
     }
 
-
-    // Modify the value at the given position
-    private void modify(int pos, Record newVal) {
-        if ((pos < 0) || (pos >= n)) {
-            return;
-        } // Illegal heap position
-        heap[pos] = newVal;
-        update(pos);
-    }
 
     private void swap(Record[] arr, int left, int right) {
         Record temp = arr[left];
