@@ -114,7 +114,7 @@ public class Reader {
             if (raf.length() == 8 * blockSize || raf.length() < 8
                 * blockSize) {
                 // Perform HeapSort
-                heap.heapSort();
+                heap.buildheap();
 
                 // One block at a time, move data from heap to output buffer
                 // and write to run file
@@ -233,9 +233,10 @@ public class Reader {
                                     recordsInput[indexOfInputBuffer]);
 
                             }
-
+                            
                             recordsOutput[recordsOutIndex] = heap
                                 .removeMin();
+
 
                             lastRecordReadFromHeap =
                                 recordsOutput[recordsOutIndex];

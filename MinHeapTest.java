@@ -9,9 +9,8 @@ import student.TestCase;
  * @version 9.22.2021
  */
 public class MinHeapTest extends TestCase {
-    
+
     private MinHeap heap;
-    private Record r1;
     private Record[] records;
 
     /**
@@ -64,8 +63,8 @@ public class MinHeapTest extends TestCase {
         assertTrue(hp.isLeaf(1));
         assertTrue(hp.isLeaf(2));
         assertFalse(hp.isLeaf(0));
-        hp.isLeaf(-1);
-        hp.isLeaf(7);
+        assertFalse(hp.isLeaf(-1));
+        assertFalse(hp.isLeaf(7));
 
     }
 
@@ -99,9 +98,9 @@ public class MinHeapTest extends TestCase {
         assertEquals(1, hp.leftchild(0));
 
         assertEquals(2, hp.rightchild(0));
-        hp.leftchild(2);
-        hp.rightchild(2);
-        hp.parent(0);
+        assertEquals(-1, hp.leftchild(2));
+        assertEquals(-1, hp.rightchild(2));
+        assertEquals(-1, hp.parent(0));
     }
 
 
@@ -132,7 +131,8 @@ public class MinHeapTest extends TestCase {
      * test GetHeap()
      */
     public void testGetHeap() {
-        assertEquals(r1, heap.getHeap()[0]);
+        MinHeap hp = new MinHeap(records, 1, 1);
+        assertEquals(records[0], hp.getHeap()[0]);
     }
 
 
@@ -153,7 +153,6 @@ public class MinHeapTest extends TestCase {
      */
     public void testRemove() {
 
-        assertEquals(r1, heap.remove(0));
         int len = Long.BYTES + Double.BYTES;
         Record[] records2 = new Record[6];
         MinHeap hp = new MinHeap(records2, 0, 6);
@@ -374,6 +373,8 @@ public class MinHeapTest extends TestCase {
         records5[1] = r2;
         records5[2] = r3;
 
+        MinHeap hp2 = new MinHeap(records5, 0, 6);
+        assertEquals(null, hp2.removeMin());
 
     }
 
