@@ -1,3 +1,4 @@
+
 // On my honor:
 //
 // - I have not used source code obtained from another student,
@@ -29,8 +30,6 @@ import student.TestCase;
 public class RecordTest extends TestCase {
 
     private byte[] aBite;
-    private Record rec;
-
 
     /**
      * The setup for the tests
@@ -40,35 +39,36 @@ public class RecordTest extends TestCase {
         buffer.putLong(7);
         buffer.putDouble(8, 1);
         aBite = buffer.array();
-        }
+    }
 
 
     /**
      * Tests the constructor
      */
     public void testRecord() {
-        Record rec = new Record(aBite);
-        assertEquals((double)1, rec.getKey(), 0.00);
-        assertEquals((double)7, rec.getId(), 0.00);
-        assertEquals(aBite, rec.getCompleteRecord());
-        assertTrue(rec.toString().equals("1.0"));
+        Record rec2 = new Record(aBite);
+        assertEquals((double)1, rec2.getKey(), 0.00);
+        assertEquals((double)7, rec2.getId(), 0.00);
+        assertTrue(rec2.toString().equals("1.0"));
     }
-    
+
+
     /**
      * Tests the compareTo()
      */
     public void testCompareTo() {
-        Record rec = new Record(aBite);
+        Record rec2 = new Record(aBite);
         Record recToBeCompared = new Record(aBite);
-        assertEquals(rec.compareTo(recToBeCompared), 0);
+        assertEquals(rec2.compareTo(recToBeCompared), 0);
     }
-    
+
+
     /**
      * Tests the toString()
      */
     public void testToString() {
-        Record rec = new Record(aBite);
-        assertEquals("1.0", rec.toString());
+        Record rec2 = new Record(aBite);
+        assertEquals("1.0", rec2.toString());
     }
 
 }

@@ -1,3 +1,4 @@
+
 // On my honor:
 //
 // - I have not used source code obtained from another student,
@@ -22,26 +23,26 @@ import student.TestCase;
 /**
  * Test class for entry method to program
  * 
- * @author 
- * @version 
+ * @author Jonathan Reynosa, Emilio Rivera
+ * @version 9.22.2021
  */
 public class ExternalsortTest extends TestCase {
-    
-    
+
     /**
      * set up for tests
      */
     public void setUp() {
-        //nothing to set up.
+        // nothing to set up.
     }
-    
+
+
     /**
      * Get code coverage of the class declaration.
      */
     public void testExternalsortInit() {
         Externalsort sorter = new Externalsort();
         assertNotNull(sorter);
-        Externalsort.main(null);
+        // Externalsort.main(null);
     }
 
 }
