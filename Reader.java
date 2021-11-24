@@ -20,6 +20,7 @@
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class Reader {
     @SuppressWarnings({ "unchecked", "resource" })
     Reader(RandomAccessFile raf) {
         try {
-
+            PrintStream fileOut = new PrintStream("out.txt");
             RandomAccessFile runFile = new RandomAccessFile("runFile.bin",
                 "rw");
             RandomAccessFile outputFile = new RandomAccessFile(
@@ -116,7 +117,7 @@ public class Reader {
                     }
 
                     // Write to run file
-                    writeOutputToFile(outputBuffer, recordsOutput, runFile,
+                    writeOutputToFile(outputBuffer, recordsOutput, outputFile,
                         i);
                     recordsOutput = new Record[recordsInBlock];
                 }
@@ -160,10 +161,11 @@ public class Reader {
                         else if (numRecordsInInputBuffer == 0 && blocksRead
                             * blockSize != raf.length()) {
 
-                            blocksRead++;
+                            
 
                             recordsInput = refillInputBuffer(raf,
                                 blocksRead, inputBuffer);
+                            blocksRead++;
 
                             indexOfInputBuffer = 0;
                             numRecordsInInputBuffer = recordsInBlock;
@@ -316,9 +318,6 @@ public class Reader {
                     writeOutputToFile(outputBuffer, recordsOutput,
                         outputFile, writePos);
 
-                    System.out.println(" (writePos: " + writePos
-                        + " recordsOutput[0]: " + recordsOutput[0] + ")");
-
                     if (doOneLastTime) {
                         doOneLastTime = false;
                     }
@@ -365,8 +364,9 @@ public class Reader {
                 }
 
             }
-
+            
             printFirstRecordInBlock(outputFile);
+           
 
             runFile.close();
             outputFile.close();
@@ -440,11 +440,16 @@ public class Reader {
 
                 counter = 0;
             }
-            System.out.print(tempRecord.getId() + " " + tempRecord.getKey()
-                + " ");
+            System.out.print(tempRecord.getId() + " " + tempRecord.getKey()+" "
+                );
 
             counter++;
         }
+    }
+    
+    public void printAllRecordsInBlock(RandomAccessFile file)
+        throws IOException {
+
     }
 
 
@@ -475,7 +480,6 @@ public class Reader {
                 byte[] recordBytes = new byte[recordSize];
                 buffer.get(recordBytes);
                 records[recordsIndex] = new Record(recordBytes);
-
                 recordsIndex++;
                 numRecordsThatSkippedTheInputBuffer++;
             }
@@ -667,12 +671,11 @@ public class Reader {
     public Record[] bytesToRecords(ByteBuffer buffer, int recordArrSize) {
         int recordsIndex = 0;
         Record[] records = new Record[recordArrSize];
-
+        
         for (int offset = 0; offset < blockSize; offset += 16) {
             byte[] recordBytes = new byte[recordSize];
             buffer.get(recordBytes);
             records[recordsIndex] = new Record(recordBytes);
-
             recordsIndex++;
         }
         return records;
