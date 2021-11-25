@@ -3,8 +3,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author Jonathan Reynosa, Emilio Rivera
- * @version 9.22.2021
+ * Holds a single record
+ * 
+ * @author Jonathan Reynosa Emilio Rivera
+ * @version 11.24.2021
  */
 public class Run {
     private int indexOfFirst;
@@ -12,107 +14,94 @@ public class Run {
     private int indexOfLastRecRead;
     private List<Record> currentBlockOfRecord;
     private boolean hasEverRead = false;
-
-    /**
-     * constructor
-     * 
-     * @param indexOfFirst
-     *              index of first
-     */
+    
     Run(int indexOfFirst) {
         this.indexOfFirst = indexOfFirst;
         this.indexOfLastRecRead = this.indexOfFirst - 1;
         currentBlockOfRecord = new LinkedList<Record>();
-
+        
     }
-
-
+    
     /**
-     * setHasRead()
+     * Sets hasRead
      */
     public void setHasRead() {
         hasEverRead = true;
     }
-
-
+    
     /**
-     * getHasRead()
+     * returns hasRead
      * 
-     * @return true if read before
+     * @return hasRead
      */
     public boolean getHasRead() {
         return hasEverRead;
     }
-
-
+    
     /**
-     * getIndexOfFirst()
+     * returns indexOfFirst
      * 
      * @return index
      */
     public int getIndexOfFirst() {
         return indexOfFirst;
     }
-
-
+    
     /**
-     * getIndexOfLast()
+     * returns indexOfLast
      * 
      * @return index
      */
     public int getIndexOfLast() {
         return indexOfLast;
     }
-
-
+    
     /**
-     * getIndexOfLastRecRead()
+     * returns indexOfLastRecRead
      * 
-     * @return index of last
+     * @return index
      */
     public int getIndexOfLastRecRead() {
         return indexOfLastRecRead;
     }
-
-
+    
     /**
-     * getBlockOfRecord()
+     * returns record list of block
      * 
-     * @return list
+     * @return record list
      */
     public List<Record> getBlockOfRecord() {
         return currentBlockOfRecord;
     }
-
-
+    
     /**
-     * setLastRecRead
+     * Set lastRecRead
      * 
      * @param curr
-     *          current
+     * 				new value
      */
     public void setLastRecRead(int curr) {
         indexOfLastRecRead = curr;
     }
-
-
+    
     /**
-     * setIndexOfLast
+     * Set IndexOfLast
      * 
-     * @param last index
+     * @param last
+     * 				new value
      */
     public void setIndexOfLast(int last) {
         indexOfLast = last;
     }
-
-
+    
     /**
-     * setBlockOfRecord
+     * Set records in block
      * 
      * @param recs
-     *              Records
+     * 				List of records
      */
     public void setBlockOfRecord(List<Record> recs) {
         currentBlockOfRecord = recs;
     }
 }
+

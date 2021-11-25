@@ -1,4 +1,3 @@
-
 // On my honor:
 //
 // - I have not used source code obtained from another student,
@@ -29,7 +28,7 @@ import java.nio.ByteBuffer;
 public class Record implements Comparable<Record> {
 
     private byte[] completeRecord;
-
+    private double key;
     /**
      * The constructor for the Record class
      * 
@@ -38,6 +37,8 @@ public class Record implements Comparable<Record> {
      */
     public Record(byte[] record) {
         completeRecord = record;
+        ByteBuffer buff = ByteBuffer.wrap(completeRecord);
+        key = buff.getDouble(8);
     }
 
 
@@ -50,7 +51,6 @@ public class Record implements Comparable<Record> {
         return completeRecord;
     }
 
-
     /**
      * Returns the object's key
      * 
@@ -60,13 +60,7 @@ public class Record implements Comparable<Record> {
         ByteBuffer buff = ByteBuffer.wrap(completeRecord);
         return buff.getDouble(8);
     }
-
-
-    /**
-     * Returns the object's key
-     * 
-     * @return the key
-     */
+    
     public long getId() {
         ByteBuffer buff = ByteBuffer.wrap(completeRecord);
         return buff.getLong(0);
@@ -76,7 +70,7 @@ public class Record implements Comparable<Record> {
     /**
      * Compare Two Records based on their keys
      * 
-     * @param toBeCompared
+     * @param o
      *            - The Record to be compared.
      * @return A negative integer, zero, or a positive integer as this employee
      *         is less than, equal to, or greater than the supplied record

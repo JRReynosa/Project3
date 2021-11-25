@@ -28,10 +28,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Reader class
- * 
- * @author Jonathan Reynosa, Emilio Rivera
- * @version 9.22.2021
+ * The class containing reader method for processing data
+ *
+ * @author Jonathan Reynosa Emilio Rivera
+ * @version 11.24.2021
  */
 public class Reader {
     private final int blockSize = 8192;
@@ -42,19 +42,20 @@ public class Reader {
     private int numRecordsThatSkippedTheInputBuffer = 0;
 
     /**
-     * Constructor
-     * 
-     * @param raf
-     *            file
+     * Main Reader method
+     *
+     * @param raf File
+     * @param name File name
      */
     @SuppressWarnings({ "unchecked", "resource" })
-    Reader(RandomAccessFile raf) {
+    Reader(RandomAccessFile raf, String name) {
         try {
-
             RandomAccessFile runFile = new RandomAccessFile("runFile.bin",
                 "rw");
             RandomAccessFile outputFile = new RandomAccessFile(
-                "output.bin", "rw");
+                name, "rw");
+            
+            outputFile.setLength(raf.length());
 
             int recordArrSize = 0;
             int numOfBlocks = 0;
@@ -115,7 +116,7 @@ public class Reader {
                 * blockSize) {
                 // Perform HeapSort
                 heap.buildheap();
-
+                
                 // One block at a time, move data from heap to output buffer
                 // and write to run file
                 for (int i = 0; i < numOfBlocks; i++) {
@@ -125,11 +126,12 @@ public class Reader {
                     int outBufferSize = 0;
                     while (outBufferSize < recordsInBlock) {
                         recordsOutput[outBufferSize] = heap.removeMin();
+                        outBufferSize++;
                     }
 
                     // Write to run file
-                    writeOutputToFile(outputBuffer, recordsOutput,
-                        outputFile, i);
+                    writeOutputToFile(outputBuffer, recordsOutput, outputFile,
+                        i);
                     recordsOutput = new Record[recordsInBlock];
                 }
 
@@ -159,6 +161,7 @@ public class Reader {
 
                     while (!heap.isEmpty()) {
 
+                    	// Output buffer is full
                         if (recordsOutIndex == recordsInBlock) {
 
                             writeOutputToFile(outputBuffer, recordsOutput,
@@ -169,9 +172,9 @@ public class Reader {
                             writePos++;
 
                         }
+                        // Input buffer is empty
                         else if (numRecordsInInputBuffer == 0 && blocksRead
                             * blockSize != raf.length()) {
-
                             recordsInput = refillInputBuffer(raf,
                                 blocksRead, inputBuffer);
                             blocksRead++;
@@ -186,7 +189,6 @@ public class Reader {
                             * blockSize == raf.length()) {
 
                             if (heap.isEmpty()) {
-
                                 break;
                             }
                             else {
@@ -201,6 +203,7 @@ public class Reader {
                                 recordsOutIndex++;
                             }
                         }
+                        // First time ever reading record in
                         else if (recordsOutIndex == 0 && isFirstTimeEver) {
                             isFirstTimeEver = false;
 
@@ -233,10 +236,9 @@ public class Reader {
                                     recordsInput[indexOfInputBuffer]);
 
                             }
-                            
+
                             recordsOutput[recordsOutIndex] = heap
                                 .removeMin();
-
 
                             lastRecordReadFromHeap =
                                 recordsOutput[recordsOutIndex];
@@ -245,9 +247,6 @@ public class Reader {
                             numRecordsInInputBuffer--;
                             recordsOutIndex++;
                             indexOfInputBuffer++;
-
-                        }
-                        else {
 
                         }
 
@@ -374,8 +373,9 @@ public class Reader {
                 }
 
             }
-
+            
             printFirstRecordInBlock(outputFile);
+           
 
             runFile.close();
             outputFile.close();
@@ -394,14 +394,11 @@ public class Reader {
 
 
     /**
-     * Add records to array list
+     * Add stray records to a list
      * 
-     * @param heap
-     *            The heap
-     * @param numStrays
-     *            Stray values in heap
-     * @return
-     *         List of records
+     * @param heap MinHeap with stray records
+     * @param numStrays Number of strays
+     * @return List of Strays
      */
     public List<Record> addStrayRecordsToList(
         MinHeap heap,
@@ -417,12 +414,10 @@ public class Reader {
 
 
     /**
-     * Make an array of smallest records
+     * Return record list of smallest records
      * 
-     * @param destroyableListOfRuns
-     *            list of runs
-     * @return
-     *         list of records
+     * @param destroyableListOfRuns Runs with records
+     * @return List of smallest records
      */
     public List<Record> makeArrayOfSmallestRecs(
         List<Run> destroyableListOfRuns) {
@@ -435,12 +430,10 @@ public class Reader {
 
 
     /**
-     * print first record in block
+     * Print records in the blocks
      * 
-     * @param file
-     *            File
+     * @param file File read from
      * @throws IOException
-     * 
      */
     public void printFirstRecordInBlock(RandomAccessFile file)
         throws IOException {
@@ -457,31 +450,40 @@ public class Reader {
             buffer.get(bytes);
 
             Record tempRecord = new Record(bytes);
+            
             if (counter == 5) {
-                System.out.print("\n");
-
+                System.out.println("");
                 counter = 0;
             }
-            System.out.print(tempRecord.getId() + " " + tempRecord.getKey()
-                + " ");
+            
+            long id = tempRecord.getId();
+            double key = tempRecord.getKey();
+            
+            if (counter == 4 || i == numOfBlocks - 1) {
+            	System.out.print(id + " " + key);
+            }
+            else {
+            	System.out.print(id + " " + key + " ");
+            }
 
             counter++;
         }
     }
+    
+    public void printAllRecordsInBlock(RandomAccessFile file)
+        throws IOException {
+
+    }
 
 
     /**
-     * Fill up the heap
+     * Fill heap with initial data
      * 
-     * @param raf
-     *            file
-     * @param inputBuffer
-     *            input buffer
-     * @param records
-     *            records
-     * @param numOfBlocks
-     *            number of blocks
-     * @return the MinHeap
+     * @param raf File
+     * @param inputBuffer Input buffer
+     * @param records Records array reading from
+     * @param numOfBlocks Blocks of data
+     * @return Filled heap
      * @throws IOException
      */
     public MinHeap fillHeap(
@@ -517,18 +519,13 @@ public class Reader {
 
 
     /**
-     * Write to the output file
+     * Write to output file
      * 
-     * @param outputBuffer
-     *            Output buffer
-     * @param recordsOutput
-     *            Records output
-     * @param outputFile
-     *            output file
-     * @param writePos
-     *            Write position
+     * @param outputBuffer Output Buffer
+     * @param recordsOutput Records output buffer
+     * @param outputFile File
+     * @param writePos Position in File
      * @throws IOException
-     *             e
      */
     public void writeOutputToFile(
         byte[] outputBuffer,
@@ -554,18 +551,13 @@ public class Reader {
 
 
     /**
-     * Refill input buffer
+     * Refill Input Buffer
      * 
-     * @param raf
-     *            File
-     * @param blocksRead
-     *            blocks read
-     * @param inputBuffer
-     *            input buffer
-     * @return
-     *         the record array
+     * @param raf File
+     * @param blocksRead Blocks read from file
+     * @param inputBuffer Input Buffer
+     * @return Record array for buffer
      * @throws IOException
-     *             e
      */
     public Record[] refillInputBuffer(
         RandomAccessFile raf,
@@ -586,20 +578,14 @@ public class Reader {
 
 
     /**
-     * Read in records for merging
+     * Read in records to merge runs
      * 
-     * @param runFile
-     *            run file
-     * @param inputBuffer
-     *            input buffer
-     * @param destroyableListOfRuns
-     *            list of runs
-     * @param indexOfRun
-     *            index of the runs
-     * @param recordsInput
-     *            Records input
+     * @param runFile File containing runs
+     * @param inputBuffer Input buffer
+     * @param destroyableListOfRuns List of runs considered
+     * @param indexOfRun Current Run
+     * @param recordsInput Input Buffer of Records
      * @throws IOException
-     *             e
      */
     public void ReadInRecordsForMerging(
         RandomAccessFile runFile,
@@ -656,11 +642,11 @@ public class Reader {
 
 
     /**
-     * Find the least value records
+     * Find least record values in a given list
      * 
-     * @param recs
-     *            List of records
-     * @return least value
+     * @param recs List considered
+     * 
+     * @return least record values
      */
     public int findLeastValRecords(List<Record> recs) {
         int indexOfSmallest = 0;
@@ -679,11 +665,10 @@ public class Reader {
      * last record in the output array. If input array is greater than
      * output array return true.
      * 
-     * @param output
-     *            out
-     * @param input
-     *            in
-     * @return true if greater
+     * @param inputIndex Index in buffer
+     * @param input Record array buffer
+     * @param last Last record
+     * @return
      */
     public boolean isCurrentGreaterThanLast(
         Record[] input,
@@ -695,12 +680,10 @@ public class Reader {
 
 
     /**
-     * convert records to bytes
+     * Convert Records array to byte array 
      * 
-     * @param records
-     *            record array
-     * @return
-     *         Byte array
+     * @param records Records to convert
+     * @return byte array of records
      */
     public byte[] recordsToBytes(Record[] records) {
         ByteBuffer buffer = ByteBuffer.allocate(blockSize);
@@ -719,17 +702,14 @@ public class Reader {
     /**
      * Takes in a buffer and converts it into an array of records
      * 
-     * @param buffer
-     *            buffer to get values from
-     * @param recordArrSize
-     *            array size
+     * @param buffer buffer with data
+     * @param recordArrSize size of data
      * @return records
-     *         the records
      */
     public Record[] bytesToRecords(ByteBuffer buffer, int recordArrSize) {
         int recordsIndex = 0;
         Record[] records = new Record[recordArrSize];
-
+        
         for (int offset = 0; offset < blockSize; offset += 16) {
             byte[] recordBytes = new byte[recordSize];
             buffer.get(recordBytes);
@@ -741,14 +721,11 @@ public class Reader {
 
 
     /**
-     * read block
+     * Read block from file
      * 
-     * @param raf
-     *            file
+     * @param raf file
      * @return byte array
      * @throws IOException
-     *             e
-     * 
      */
     public byte[] readBlock(RandomAccessFile raf) throws IOException {
         byte[] block = new byte[blockSize];
@@ -760,15 +737,12 @@ public class Reader {
 
 
     /**
-     * read block
+     * Read block starting at pos
      * 
-     * @param raf
-     *            file
-     * @param pos
-     *            position
+     * @param raf file
+     * @param pos file position
      * @return byte array
      * @throws IOException
-     *             e
      */
     public byte[] readBlock2(RandomAccessFile raf, long pos)
         throws IOException {

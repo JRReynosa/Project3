@@ -18,20 +18,28 @@
 // anything during the discussion or modifies any computer file
 // during the discussion. I have violated neither the spirit nor
 // letter of this restriction.
-
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Driver class for CS 3114 Project 3
+ */
 
 /**
  * The class containing the main method.
  *
- * @author Jonathan Reynosa, Emilio Rivera
- * @version 9.22.2021
+ * @author Jonathan Reynosa Emilio Rivera
+ * @version 11.24.2021
  */
 public class Externalsort {
 
     /**
-     * Takes in arguments in main method
+     * Entry method for program
      * 
      * @param args
      *            Command line parameters
@@ -42,17 +50,15 @@ public class Externalsort {
         if (args.length != 1) {
             throw new IllegalArgumentException(
                 "\nThe number of arguments is invalid."
-                    + "\nThe program should be invoked as '> "
-                    + "java Externalsort "
-                    + "{record file name}'\nWhere record file "
-                    + "name is a .txt file.");
+                    + "\nThe program should be invoked as '> java Externalsort "
+                    + "{record file name}'\nWhere record file name is a .txt file.");
         }
 
         try {
 
             RandomAccessFile raf = new RandomAccessFile(args[0], "r");
-
-            Reader reader = new Reader(raf);
+            
+            Reader reader = new Reader(raf, args[0]);
 
         }
 
